@@ -1,0 +1,137 @@
+[
+  {
+    "name": "Phishing - PayPal Impersonation",
+    "url": "http://paypal-secure-login.tk/verify",
+    "subject": "Urgent: Account Suspended",
+    "body": "Dear customer, Your PayPal account has been suspended due to unusual activity. Please verify your account immediately by clicking here: http://paypal-secure-login.tk/verify. Enter your password and security code to restore access.",
+    "expected": {
+      "classification": "Phishing"
+    }
+  },
+  {
+    "name": "Legitimate - PayPal Receipt",
+    "url": "https://www.paypal.com/signin",
+    "subject": "Your PayPal Receipt",
+    "body": "Hi John Smith, Thank you for your payment of $25.00 to Example Store. View your receipt at https://www.paypal.com/activity",
+    "expected": {
+      "classification": "Legitimate"
+    }
+  },
+  {
+    "name": "Suspicious - Generic Verification",
+    "url": "https://secure-account-verification.com",
+    "subject": "Action Required",
+    "body": "Dear valued customer, Please update your account information within 24 hours to avoid service interruption. Click here to proceed.",
+    "expected": {
+      "classification": "Suspicious"
+    }
+  },
+  {
+    "name": "Phishing - Bank Impersonation with IP",
+    "url": "http://192.168.1.100/chase/login",
+    "subject": "Chase Bank - Verify Your Identity",
+    "body": "Dear customer, We detected unusual activity on your Chase account. Kindly verify your identity by providing your account number, SSN, and password at http://192.168.1.100/chase/login",
+    "expected": {
+      "classification": "Phishing"
+    }
+  },
+  {
+    "name": "Phishing - Microsoft with @ Symbol",
+    "url": "http://microsoft.com@malicious-site.com/login",
+    "subject": "Microsoft Account Security Alert",
+    "body": "Your Microsoft account will be locked in 24 hours. Verify now to prevent account closure. Click here immediately.",
+    "expected": {
+      "classification": "Phishing"
+    }
+  },
+  {
+    "name": "Legitimate - Amazon Order Confirmation",
+    "url": "https://www.amazon.com/orders",
+    "subject": "Your Amazon.com order #123-4567890-1234567",
+    "body": "Hello Sarah Johnson, Your order of 'Wireless Mouse' has been shipped. Track your package at https://www.amazon.com/orders. Estimated delivery: Dec 16, 2025.",
+    "expected": {
+      "classification": "Legitimate"
+    }
+  },
+  {
+    "name": "Phishing - Apple ID with Shortened URL",
+    "url": "https://bit.ly/apple-verify",
+    "subject": "Your Apple ID has been locked",
+    "body": "Dear user, Your Apple ID has been locked due to security concerns. Verify your identity immediately at https://bit.ly/apple-verify or your account will be permanently disabled.",
+    "expected": {
+      "classification": "Phishing"
+    }
+  },
+  {
+    "name": "Suspicious - Job Offer",
+    "url": "https://career-opportunities-now.com",
+    "subject": "Congratulations! Job Offer",
+    "body": "Dear applicant, You have been selected for a remote position. Salary: $5000/month. Click here to accept and provide your bank details for direct deposit setup.",
+    "expected": {
+      "classification": "Suspicious"
+    }
+  },
+  {
+    "name": "Phishing - Netflix with Excessive Subdomains",
+    "url": "https://secure.login.verify.netflix-account.tk",
+    "subject": "Netflix - Update Payment Method",
+    "body": "Dear member, Your Netflix subscription will be cancelled unless you update your payment information within 48 hours. Update now at https://secure.login.verify.netflix-account.tk",
+    "expected": {
+      "classification": "Phishing"
+    }
+  },
+  {
+    "name": "Legitimate - Google Security Alert",
+    "url": "https://myaccount.google.com/security",
+    "subject": "Security alert for your Google Account",
+    "body": "Hi Alex Chen, We noticed a new sign-in to your Google Account from a Windows device in New York. If this was you, you don't need to do anything. If not, review your account activity at https://myaccount.google.com/security",
+    "expected": {
+      "classification": "Legitimate"
+    }
+  },
+  {
+    "name": "Phishing - IRS Tax Scam",
+    "url": "http://irs-tax-refund.xyz/claim",
+    "subject": "IRS: You have a pending tax refund",
+    "body": "Dear taxpayer, You are eligible for a tax refund of $1,247. Click here immediately to claim your refund: http://irs-tax-refund.xyz/claim. Provide your SSN and bank account details.",
+    "expected": {
+      "classification": "Phishing"
+    }
+  },
+  {
+    "name": "Suspicious - LinkedIn Connection",
+    "url": "https://linkedin-connect.com",
+    "subject": "You have 5 new connection requests",
+    "body": "Dear professional, You have pending connection requests on LinkedIn. View them now before they expire.",
+    "expected": {
+      "classification": "Suspicious"
+    }
+  },
+  {
+    "name": "Legitimate - GitHub Notification",
+    "url": "https://github.com/notifications",
+    "subject": "[GitHub] New issue in your repository",
+    "body": "Hi developer123, A new issue was opened in your repository 'awesome-project'. View it at https://github.com/notifications",
+    "expected": {
+      "classification": "Legitimate"
+    }
+  },
+  {
+    "name": "Phishing - Cryptocurrency Scam",
+    "url": "https://binance-security-verify.com",
+    "subject": "Binance: Verify your account or lose access",
+    "body": "Dear user, Your Binance account requires immediate verification. Failure to verify within 12 hours will result in permanent account suspension. Enter your password and 2FA code here.",
+    "expected": {
+      "classification": "Phishing"
+    }
+  },
+  {
+    "name": "Phishing - AI-Generated Banking Email",
+    "url": "https://secure-banking-portal.com",
+    "subject": "Important: Account Verification Required",
+    "body": "I hope this message finds you well. We are writing to inform you that your account requires verification. Please be advised that failure to complete this process may result in service interruption. For your convenience, we have provided a secure link. Rest assured, your information is protected.",
+    "expected": {
+      "classification": "Phishing"
+    }
+  }
+]

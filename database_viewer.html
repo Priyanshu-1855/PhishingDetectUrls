@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Database Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .stat-value.phishing {
+            color: #dc2626;
+        }
+
+        .stat-value.legitimate {
+            color: #10b981;
+        }
+
+        .stat-value.total {
+            color: #667eea;
+        }
+
+        .stat-value.patterns {
+            color: #f59e0b;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .urls-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .url-item {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background 0.2s;
+        }
+
+        .url-item:hover {
+            background: #f9fafb;
+        }
+
+        .url-item:last-child {
+            border-bottom: none;
+        }
+
+        .url-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .url-text {
+            font-size: 14px;
+            color: #1f2937;
+            word-break: break-all;
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .classification {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .classification.phishing {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .classification.suspicious {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .classification.legitimate {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .risk-score {
+            font-size: 24px;
+            font-weight: 800;
+            margin-left: 15px;
+        }
+
+        .risk-score.high {
+            color: #dc2626;
+        }
+
+        .risk-score.medium {
+            color: #f59e0b;
+        }
+
+        .risk-score.low {
+            color: #10b981;
+        }
+
+        .url-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 12px;
+        }
+
+        .detail-item {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .reasons {
+            margin-top: 12px;
+        }
+
+        .reason-tag {
+            display: inline-block;
+            background: #f3f4f6;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #4b5563;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #6b7280;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .refresh-btn:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ Phishing Database Viewer</h1>
+            <p>Real-time view of all cached URLs and detection results</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-value total" id="totalUrls">0</div>
+                <div class="stat-label">Total URLs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value phishing" id="phishingUrls">0</div>
+                <div class="stat-label">Phishing Detected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value legitimate" id="legitimateUrls">0</div>
+                <div class="stat-label">Legitimate Sites</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value patterns" id="patternsLearned">0</div>
+                <div class="stat-label">Patterns Learned</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterUrls('all')">All URLs</button>
+            <button class="filter-btn" onclick="filterUrls('Phishing')">Phishing</button>
+            <button class="filter-btn" onclick="filterUrls('Suspicious')">Suspicious</button>
+            <button class="filter-btn" onclick="filterUrls('Legitimate')">Legitimate</button>
+            <button class="refresh-btn" onclick="loadData()">🔄 Refresh</button>
+        </div>
+
+        <div class="urls-container" id="urlsContainer">
+            <div class="loading">
+                <div class="spinner"></div>
+                <div>Loading database...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let currentFilter = 'all';
+        let allUrls = [];
+
+        async function loadData() {
+            try {
+                // Load statistics
+                const statsRes = await fetch(`${API_URL}/api/v1/database/stats`);
+                const statsData = await statsRes.json();
+
+                document.getElementById('totalUrls').textContent = statsData.statistics.total_urls;
+                document.getElementById('phishingUrls').textContent = statsData.statistics.phishing_urls;
+                document.getElementById('legitimateUrls').textContent = statsData.statistics.legitimate_urls;
+                document.getElementById('patternsLearned').textContent = statsData.statistics.total_patterns;
+
+                // Load URLs
+                const urlsRes = await fetch(`${API_URL}/api/v1/database/urls?limit=100`);
+                const urlsData = await urlsRes.json();
+
+                allUrls = urlsData.urls;
+                displayUrls(allUrls);
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('urlsContainer').innerHTML = `
+                    <div class="loading">
+                        <div style="color: #dc2626; font-size: 48px; margin-bottom: 20px;">❌</div>
+                        <div>Failed to load database</div>
+                        <div style="margin-top: 10px; font-size: 12px;">Make sure API is running on localhost:5000</div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayUrls(urls) {
+            const container = document.getElementById('urlsContainer');
+
+            if (urls.length === 0) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📭</div>
+                        <div>No URLs in database yet</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = urls.map(url => {
+                const riskClass = url.risk_score >= 70 ? 'high' : url.risk_score >= 40 ? 'medium' : 'low';
+                const classClass = url.classification.toLowerCase();
+
+                return `
+                    <div class="url-item">
+                        <div class="url-header">
+                            <div class="url-text">${url.url}</div>
+                            <div style="display: flex; align-items: center;">
+                                <span class="classification ${classClass}">${url.classification}</span>
+                                <span class="risk-score ${riskClass}">${url.risk_score}</span>
+                            </div>
+                        </div>
+                        <div class="url-details">
+                            <div class="detail-item">
+                                <div class="detail-label">First Seen</div>
+                                <div>${new Date(url.first_seen).toLocaleString()}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Last Checked</div>
+                                <div>${new Date(url.last_checked).toLocaleString()}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Check Count</div>
+                                <div>${url.check_count} times</div>
+                            </div>
+                        </div>
+                        ${url.reasons.length > 0 ? `
+                            <div class="reasons">
+                                ${url.reasons.map(r => `<span class="reason-tag">${r}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterUrls(filter) {
+            currentFilter = filter;
+
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter URLs
+            if (filter === 'all') {
+                displayUrls(allUrls);
+            } else {
+                const filtered = allUrls.filter(url => url.classification === filter);
+                displayUrls(filtered);
+            }
+        }
+
+        // Load data on page load
+        loadData();
+
+        // Auto-refresh every 10 seconds
+        setInterval(loadData, 10000);
+    </script>
+</body>
+
+</html>

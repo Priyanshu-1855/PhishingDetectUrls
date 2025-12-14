@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detection Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: #f3f4f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .info-box strong {
+            color: #1f2937;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #result.phishing {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 2px solid #ef4444;
+        }
+
+        #result.suspicious {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+        }
+
+        #result.legitimate {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .result-icon {
+            font-size: 32px;
+        }
+
+        .result-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .result-score {
+            font-size: 18px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+        }
+
+        .result-reasons {
+            list-style: none;
+        }
+
+        .result-reasons li {
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 6px;
+            line-height: 1.5;
+        }
+
+        .result-reasons li:before {
+            content: "• ";
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🛡️ Phishing Detection Demo</h1>
+
+        <div class="info-box">
+            <strong>✓ API Status:</strong> Connected to http://localhost:5000<br>
+            <strong>✓ API Key:</strong> demo-key-12345<br>
+            <strong>Note:</strong> Make sure the API server is running: <code>python api/app.py</code>
+        </div>
+
+        <form id="detection-form">
+            <div class="form-group">
+                <label for="url">URL to Check</label>
+                <input type="text" id="url" placeholder="http://example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Email Subject (Optional)</label>
+                <input type="text" id="subject" placeholder="Email subject line">
+            </div>
+
+            <div class="form-group">
+                <label for="body">Email Body (Optional)</label>
+                <textarea id="body" placeholder="Email content..."></textarea>
+            </div>
+
+            <button type="submit" id="submit-btn">🔍 Analyze for Phishing</button>
+        </form>
+
+        <div id="error-message" class="error-message"></div>
+
+        <div id="result">
+            <div class="result-header">
+                <div class="result-icon" id="result-icon"></div>
+                <div class="result-title" id="result-title"></div>
+            </div>
+            <div class="result-score" id="result-score"></div>
+            <div>
+                <strong>Analysis:</strong>
+                <ul class="result-reasons" id="result-reasons"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        const API_KEY = 'demo-key-12345';
+
+        document.getElementById('detection-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const url = document.getElementById('url').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+            const body = document.getElementById('body').value.trim();
+
+            // Validate input
+            if (!url && !subject && !body) {
+                showError('Please provide at least a URL, subject, or email body');
+                return;
+            }
+
+            // Hide previous results
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+
+            // Show loading state
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Analyzing...';
+
+            try {
+                // Make API request
+                const response = await fetch(`${API_URL}/api/v1/detect`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        url: url || undefined,
+                        subject: subject || undefined,
+                        body: body || undefined
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || `API error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                displayResult(result);
+
+            } catch (error) {
+                console.error('Detection error:', error);
+                showError(`Failed to analyze: ${error.message}. Make sure the API server is running on http://localhost:5000`);
+            } finally {
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🔍 Analyze for Phishing';
+            }
+        });
+
+        function displayResult(data) {
+            const resultDiv = document.getElementById('result');
+            const resultIcon = document.getElementById('result-icon');
+            const resultTitle = document.getElementById('result-title');
+            const resultScore = document.getElementById('result-score');
+            const resultReasons = document.getElementById('result-reasons');
+
+            // Set icon and classification
+            if (data.classification === 'Phishing') {
+                resultIcon.textContent = '⚠️';
+                resultDiv.className = 'phishing';
+            } else if (data.classification === 'Suspicious') {
+                resultIcon.textContent = '⚡';
+                resultDiv.className = 'suspicious';
+            } else {
+                resultIcon.textContent = '✅';
+                resultDiv.className = 'legitimate';
+            }
+
+            resultTitle.textContent = data.classification;
+            resultScore.textContent = `Risk Score: ${data.risk_score}/100 | Confidence: ${data.confidence}`;
+
+            // Display reasons
+            resultReasons.innerHTML = '';
+            if (data.reasons && data.reasons.length > 0) {
+                data.reasons.forEach(reason => {
+                    const li = document.createElement('li');
+                    li.textContent = reason;
+                    resultReasons.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = 'No specific indicators found';
+                resultReasons.appendChild(li);
+            }
+
+            // Show result
+            resultDiv.style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = '❌ ' + message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Test API connection on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${API_URL}/api/v1/health`);
+                if (response.ok) {
+                    console.log('✓ API server is running');
+                }
+            } catch (error) {
+                showError('Cannot connect to API server. Please start it with: python api/app.py');
+            }
+        });
+    </script>
+</body>
+
+</html>
