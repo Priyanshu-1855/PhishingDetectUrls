@@ -149,5 +149,5 @@ print(f"\n🏆 Best Model: {best_model['Model']}")
 print(f"   F1-Score: {best_model['F1-Score']:.4f} ({best_model['F1-Score']*100:.2f}%)")
 
 print("\n" + "="*70)
-print("✅ Metrics calculation complete!")
+print("✅ Metrics calculations complete!")
 print("="*70)

@@ -10,7 +10,7 @@ try:
     import pytesseract
     print("✓ pytesseract is installed")
 except ImportError:
-    print("✗ pytesseract not installed")
+    print("✗ pytesseract not installed ")
     sys.exit(1)
 
 # Check if Tesseract executable exists
